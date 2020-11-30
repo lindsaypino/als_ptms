@@ -1,0 +1,33 @@
+
+>msconvert.exe -v --zlib --64 --mzML --filter "peakPicking true 1-" *.raw
+>> *.mzML  # for tide search?
+>msconvert.exe -v --zlib --64 --mgf --filter "peakPicking true 1-" *.raw
+>> *.mgf  # for ann_solo
+
+>quandenser.exe -b .\batchlist.txt -f .\results\
+>> MaRaCluster consensus *.ms2
+
+## PUG
+>crux comet ../quandenser/consensus_spectra/*.ms2 ../../../zntf/data/human_20350entries_20191016_uniprot-proteome_UP000005640+reviewed_yes.fasta
+>> *.ms2, *.target.pep.xml
+
+## // ALT from Matthew The's example Triqler workflow
+> lindsay@pug:~/proj/als_ptms/results$ crux tide-index --missed-cleavages 2 --mods-spec 2M+15.9949 --decoy-format protein-reverse /data/lindsay/resources/fasta/human_20350entries_20191016_uniprot-proteome_UP000005640+reviewed_yes.fasta /data/lindsay/resources/fasta/human_20350entries_20191016_uniprot-proteome_UP000005640+reviewed_yes.fasta.index
+
+> lindsay@pug:~/proj/als_ptms/results$ crux tide-search --precursor-window 20 --precursor-window-type ppm --concat T /data/lindsay/als_ptms/consensus_spectra/MaRaCluster.consensus.part*.ms2 /data/lindsay/resources/fasta/human_20350entries_20191016_uniprot-proteome_UP000005640+reviewed_yes.fasta.index/
+## DOESN'T WORK BC BIBLIOSPEC NEEDS THE COMET OUTPUT, DOESN'T TAKE TIDE OUTPUT
+
+
+Skyline GUI: Peptide Settings > Library > Build... > (select Comet *.ms2, *.target.pep.xml)
+>> als_ptms.blib
+
+>BlibToMS2.exe als_ptms.blib
+>> als_ptms.ms2 
+
+>spectrast.exe -cN als_ptms.ms2
+>> als_ptms_U_als_ptms_new.splib
+
+## PUG
+ann_solo ARRAY JOB SUBMISSION
+>> *.mztab
+##
